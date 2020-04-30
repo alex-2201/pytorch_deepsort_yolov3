@@ -1,0 +1,6 @@
+{
+    "python.pythonPath": "/home/alex/.pyenv/versions/3.7.0/bin/python",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": false
+}
