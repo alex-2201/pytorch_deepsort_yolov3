@@ -101,24 +101,26 @@ class VideoTracker(object):
 
             # do tracking
             outputs = self.deepsort.update(bbox_xywh, cls_conf, im, cls_ids)
-
             # draw boxes for visualization
+            end = time.time()
+            frame_label = 'fps: {:.03f}, tracking numbers: {}'.format(1/(end-start), len(outputs))
+            
             if len(outputs) > 0:
                 bbox_tlwh = []
                 bbox_xyxy = outputs[:,:4]
                 identities = outputs[:,-1]
                 labels = outputs[:,-2]
-                print(identities)
-                print(cls_ids)
 
-                ori_im = draw_boxes(ori_im, bbox_xyxy, identities, cls_ids=labels, class_name_map=self.class_names)
+
+                ori_im = draw_boxes(ori_im, bbox_xyxy, identities, cls_ids=labels, class_name_map=self.class_names, frame_label=frame_label)
 
                 for bb_xyxy in bbox_xyxy:
                     bbox_tlwh.append(self.deepsort._xyxy_to_tlwh(bb_xyxy))
 
                 results.append((idx_frame-1, bbox_tlwh, identities))
-
-            end = time.time()
+            else:
+                t_size_frame = cv2.getTextSize(frame_label, cv2.FONT_HERSHEY_PLAIN, 2 , 2)[0]
+                cv2.putText(ori_im, frame_label,(0,0+t_size_frame[1]+4), cv2.FONT_HERSHEY_PLAIN, 2, [204,237,88], 2)
 
             if self.args.display:
                 cv2.imshow("test", ori_im)
