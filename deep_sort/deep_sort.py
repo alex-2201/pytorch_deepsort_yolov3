@@ -28,8 +28,8 @@ class DeepSort(object):
         # generate detections
         features = self._get_features(bbox_xywh, ori_img)
         bbox_tlwh = self._xywh_to_tlwh(bbox_xywh)
-        detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
-
+        # detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
+        detections = [Detection(bbox, conf, feature, cl) for bbox ,conf, feature, cl in zip(bbox_tlwh, confidences, features, cls_ids ) if conf>self.min_confidence]
         # run on non-maximum supression
         boxes = np.array([d.tlwh for d in detections])
         scores = np.array([d.confidence for d in detections])
@@ -38,7 +38,7 @@ class DeepSort(object):
 
         # update tracker
         self.tracker.predict()
-        self.tracker.update(detections, cls_ids)
+        self.tracker.update(detections)
 
         # output bbox identities
         outputs = []
@@ -48,7 +48,7 @@ class DeepSort(object):
             box = track.to_tlwh()
             x1,y1,x2,y2 = self._tlwh_to_xyxy(box)
             track_id = track.track_id
-            cls_id = track.cls_id
+            cls_id = track.cl
             outputs.append(np.array([x1,y1,x2,y2, cls_id, track_id], dtype=np.int))
         if len(outputs) > 0:
             outputs = np.stack(outputs,axis=0)

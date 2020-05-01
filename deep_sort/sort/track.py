@@ -63,15 +63,16 @@ class Track:
 
     """
 
-    def __init__(self, mean, covariance, track_id, n_init, max_age, cls_id,
+    def __init__(self, mean, covariance, track_id, n_init, max_age, cl,
                  feature=None):
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id        
-        self.cls_id = cls_id
         self.hits = 1
         self.age = 1
         self.time_since_update = 0
+
+        self.cl=cl
 
         self.state = TrackState.Tentative
         self.features = []
@@ -124,7 +125,7 @@ class Track:
         self.age += 1
         self.time_since_update += 1
 
-    def update(self, kf, detection, cls_id):
+    def update(self, kf, detection):
         """Perform Kalman filter measurement update step and update the feature
         cache.
 
@@ -140,7 +141,6 @@ class Track:
             self.mean, self.covariance, detection.to_xyah())
         self.features.append(detection.feature)
 
-        self.cls_id = cls_id  
         self.hits += 1
         self.time_since_update = 0
         if self.state == TrackState.Tentative and self.hits >= self._n_init:
