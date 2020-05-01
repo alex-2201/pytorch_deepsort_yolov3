@@ -93,10 +93,13 @@ class VideoTracker(object):
             # select person class
             # mask = np.logical_or(cls_ids==0, cls_ids==2)
             # mask = cls_ids==0
-            # bbox_xywh = bbox_xywh[mask]
+            person = cls_ids==0
+            # car = cls_ids==2
+            # mask = person + car
+            bbox_xywh = bbox_xywh[person]
             # bbox dilation just in case bbox too small, delete this line if using a better pedestrian detector
-            # bbox_xywh[:,3:] *= 1.2 
-            # cls_conf = cls_conf[mask]
+            bbox_xywh[:,3:] *= 1.2 
+            cls_conf = cls_conf[person]
 
 
             # do tracking
